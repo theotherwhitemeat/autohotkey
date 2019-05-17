@@ -6,7 +6,7 @@
 ; from center. You can personalize various settings at the top of the script.
 
 ; Increase the following value to make the mouse cursor move faster:
-JoyMultiplier = 5
+JoyMultiplier = 2
 
 ; Decrease the following value to require less joystick displacement-from-center
 ; to start moving the mouse.  However, you may need to calibrate your joystick
@@ -157,49 +157,19 @@ SetMouseDelay, -1  ; Makes movement smoother.
 MouseClick, left,,, 1, 0, U  ; Release the mouse button.
 return
 
-;WatchJoystick:
-;MouseNeedsToBeMoved := false  ; Set default.
-;SetFormat, float, 03
-;GetKeyState, JoyX, %JoystickNumber%JoyX
-;GetKeyState, JoyY, %JoystickNumber%JoyY
-;if JoyX > %JoyThresholdUpper%
-;{
-;	MouseNeedsToBeMoved := true
-;	DeltaX := JoyX - JoyThresholdUpper
-;}
-;else if JoyX < %JoyThresholdLower%
-;{
-;	MouseNeedsToBeMoved := true
-;	DeltaX := JoyX - JoyThresholdLower
-;}
-;else
-;	DeltaX = 0
-;if JoyY > %JoyThresholdUpper%
-;{
-;	MouseNeedsToBeMoved := true
-;	DeltaY := JoyY - JoyThresholdUpper
-;}
-;else if JoyY < %JoyThresholdLower%
-;{
-;	MouseNeedsToBeMoved := true
-;	DeltaY := JoyY - JoyThresholdLower
-;}
-;else
-;	DeltaY = 0
-;if MouseNeedsToBeMoved
-;{
-;	SetMouseDelay, -1  ; Makes movement smoother.
-;	MouseMove, DeltaX * JoyMultiplier, DeltaY * JoyMultiplier * YAxisMultiplier, 0, R
-;}
-;return
 
+realMult = 1
 WatchJoystick:
 GetKeyState, JoyPOV, %JoystickNumber%JoyPOV
 if JoyPOV = -1  ; No angle.
+{
+	realMult := 1
 	return
+}
 ;; x
 DeltaX := 0
 DeltaY := 0
+realMult := realMult * 1.03
 if (JoyPOV == 4500 or JoyPOV == 13500)
 	DeltaX := JoyMultiplier
 if (JoyPOV == 22500 or JoyPOV == 31500)
@@ -218,10 +188,9 @@ if (JoyPOV == 0)
 if (JoyPOV == 18000)
 	DeltaY := -JoyMultiplier*2
 
-;SetMouseDelay, -1  ; Makes movement smoother.
-MouseMove, DeltaX, DeltaY * YAxisMultiplier, 0, R
+SetMouseDelay, -1  ; Makes movement smoother.
+MouseMove, DeltaX * realMult, DeltaY * YAxisMultiplier * realMult, 0, R
 
-; POVs possible:
 ; 0
 ; 4500
 ; 9000
